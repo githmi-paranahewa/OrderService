@@ -97,5 +97,6 @@ func main() {
 	r.HandleFunc("/order/{orderId}", GetOrderById).Methods("GET")
 	r.HandleFunc("/order/{orderId}", UpdateOrder).Methods("PUT")
 	r.HandleFunc("/order/{orderId}", DeleteOrder).Methods("DELETE")
-	log.Fatal(http.ListenAndServe("localhost:9090", r))
+	log.Fatal(http.ListenAndServe(":9090", r))
+
 }
