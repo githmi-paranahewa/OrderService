@@ -77,7 +77,7 @@ info:
   title: order-api
   version: 1.0.0
 servers:
-  - url: http://localhost:9090
+  - url: http://orderservice-3556955799:9090/http://localhost:9090/order
 paths:
   /order:
     post:
