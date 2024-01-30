@@ -1,3 +1,77 @@
+# openapi: 3.0.0
+# info:
+#   title: order-api
+#   version: 1.0.0
+# servers:
+#   - url: http://localhost:9090
+# paths:
+#   /order:
+#     post:
+#       tags:
+#         - default
+#       summary: create
+#       requestBody:
+#         content:
+#           application/json:
+#             schema:
+#               type: object
+#               example:
+#                 ID: "1"
+#                 items:
+#                   [
+#                     { "ItemID": "2", "Quantity": 1 },
+#                     { "ItemID": "9", "Quantity": 3 },
+#                   ]
+#                 Toatal: 20.2
+#                 Status: "Ongoing"
+#       responses:
+#         "200":
+#           description: Successful response
+#           content:
+#             application/json: {}
+#     put:
+#       tags:
+#         - default
+#       summary: update
+#       requestBody:
+#         content:
+#           application/json:
+#             schema:
+#               type: object
+#               example:
+#                 ID: "1"
+#                 items:
+#                   [
+#                     { "ItemID": "2", "Quantity": 1 },
+#                     { "ItemID": "9", "Quantity": 3 },
+#                   ]
+#                 Toatal: 20.2
+#                 Status: "Ongoing"
+#       responses:
+#         "200":
+#           description: Successful response
+#           content:
+#             application/json: {}
+#     get:
+#       tags:
+#         - default
+#       summary: get
+#       responses:
+#         "200":
+#           description: Successful response
+#           content:
+#             application/json: {}
+#   /order/1:
+#     delete:
+#       tags:
+#         - default
+#       summary: delete
+#       responses:
+#         "200":
+#           description: Successful response
+#           content:
+#             application/json: {}
+
 openapi: 3.0.0
 info:
   title: order-api
@@ -11,19 +85,11 @@ paths:
         - default
       summary: create
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              type: object
-              example:
-                ID: "1"
-                items:
-                  [
-                    { "ItemID": "2", "Quantity": 1 },
-                    { "ItemID": "9", "Quantity": 3 },
-                  ]
-                Toatal: 20.2
-                Status: "Ongoing"
+              $ref: "#/components/schemas/OrderInput"
       responses:
         "200":
           description: Successful response
@@ -34,19 +100,11 @@ paths:
         - default
       summary: update
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              type: object
-              example:
-                ID: "1"
-                items:
-                  [
-                    { "ItemID": "2", "Quantity": 1 },
-                    { "ItemID": "9", "Quantity": 3 },
-                  ]
-                Toatal: 20.2
-                Status: "Ongoing"
+              $ref: "#/components/schemas/OrderInput"
       responses:
         "200":
           description: Successful response
@@ -61,7 +119,13 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /order/1:
+  /order/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
     delete:
       tags:
         - default
@@ -71,3 +135,24 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
+components:
+  schemas:
+    OrderInput:
+      type: object
+      properties:
+        ID:
+          type: string
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              ItemID:
+                type: string
+              Quantity:
+                type: integer
+        Total:
+          type: number
+        Status:
+          type: string
