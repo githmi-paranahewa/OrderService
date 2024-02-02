@@ -34,8 +34,8 @@ spec:
   outbound:
     # +optional Defines the service references from the internal API marketplace.
     serviceReferences:
-  - name: choreo:///githmi/kdnv/knjmeg/ec982/v1.0/PUBLIC
-    connectionConfig: 01eebf36-a906-1d36-abcb-6e4130f7c9f0
+  - name: choreo:///githmi/kdnv/knjmeg/9e916/v1.0/PUBLIC
+    connectionConfig: 01eec0bd-72a7-1900-87d3-63d1519c19a7
         env:
           - from: ServiceURL
             to: SERVICE_URL

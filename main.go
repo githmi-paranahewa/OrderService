@@ -4,29 +4,35 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
+	"io/ioutil"
+	"math/rand"
+
+	// "os"
+	"strconv"
+	// "time"
 
 	// "os"
 
 	// "fmt"
 	"log"
-	"math/rand"
+	// "math/rand"
 	"net/http"
-	"strconv"
+	// "strconv"
 
 	"github.com/gorilla/mux"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 	// "golang.org/x/oauth2/clientcredentials"
 	// "golang.org/x/tools/go/analysis/passes/appends"
 )
 
-// type Item struct {
-// 	ID         string
-// 	Name       string
-// 	Price      float64
-// 	Quantity   int
-// 	OrderItems []OrderItem `gorm:"foreignKey:ItemID"`
-// }
+type Item struct {
+	ID         string
+	Name       string
+	Price      float64
+	Quantity   int
+	OrderItems []OrderItem `gorm:"foreignKey:ItemID"`
+}
 
 type OrderItem struct {
 	ItemID   string
@@ -41,10 +47,38 @@ type Order struct {
 }
 
 // var clientCredsConfig = clientcredentials.Config{
-// 	ClientID:     "CLIENT_ID",
-// 	ClientSecret: "CLIENT_SECRET",
-// 	TokenURL:     "TOKEN_URL",
+// 	ClientID:     os.Getenv("CLIENT_ID"),
+// 	ClientSecret: os.Getenv("CLIENT_SECRET"),
+// 	TokenURL:     os.Getenv("TOKEN_URL"),
 // }
+
+var clientCredsConfig = clientcredentials.Config{
+	ClientID:     "NmjtwiEs8yPft4wii9WGwc_TPIca",
+	ClientSecret: "m8HOuvjruaGnDXg6vMteXp9clcAa",
+	TokenURL:     "https://sts.choreo.dev/oauth2/token",
+}
+
+func makeClient() *http.Client {
+	var ctx = context.Background()
+
+	var token, err = clientCredsConfig.TokenSource(context.Background()).Token()
+
+	// fmt.Printf("getting tokenLL: %v\n", token)
+	if err != nil {
+		fmt.Printf("Error getting tokenLL: %v\n", err)
+		return nil
+	}
+
+	fmt.Printf("Access Token: %s\n", token.AccessToken)
+
+	client := oauth2.NewClient(ctx, clientCredsConfig.TokenSource(ctx))
+	return client
+	// resp, err := client.Get(serviceURL)
+	// if err != nil {
+	// 	fmt.Printf("Error making API request: %v\n", err)
+	// 	return
+	// }
+}
 
 var orders []Order
 
@@ -78,11 +112,85 @@ func GetOrderById(w http.ResponseWriter, r *http.Request) {
 
 func AddOrder(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "pkgication/json")
+	client := makeClient()
+	resp, err := client.Get(serviceURL + "/item")
+	if err != nil {
+		fmt.Printf("Error making API request: %v\n", err)
+		return
+	}
+	var respond Item
+	defer resp.Body.Close()
+	resBody, err := ioutil.ReadAll(resp.Body)
+	fmt.Println("show respBody ", string(resBody))
+	if err != nil {
+		fmt.Println("error")
+	}
+	var items []Item
+
+	// Unmarshal the JSON data into the struct
+	err = json.Unmarshal(resBody, &items)
+	if err != nil {
+		fmt.Println("Error unmarshalling JSON:", err)
+		return
+	}
+
+	// Now, 'item' contains the structured data
+	for _, item := range items {
+		fmt.Printf("ID: %s, Name: %s, Price: %f, Quantity: %d\n", item.ID, item.Name, item.Price, item.Quantity)
+	}
+	// for _, item := range resBody {
+	// err = json.Unmarshal(resBody, &respond)
+	// fmt.Println()
+	// if err != nil {
+	// 	http.Error(w, "Error unmarshalling JSON", http.StatusInternalServerError)
+	// 	return
+	// }
+	// }
+	// err = json.Unmarshal([]byte(resBody), &respond)
+	// err, _ = w.Write(resBody)
+	// _ = json.NewDecoder().Decode(&respond)
+	fmt.Println("After Unmarshal-respondbody")
+	fmt.Println("RespondID start", respond.Name, "end ")
+
+	// defer resp.Body.Close()
+	// fmt.Printf("request: %v\n", resp)
 	var order Order
+	// var respond Item
+	// _ = json.NewDecoder(resp.Body).Decode(&respond)
+
 	_ = json.NewDecoder(r.Body).Decode(&order)
 	order.ID = strconv.Itoa(rand.Intn(100000000))
+	// fmt.Printf("respondID", respond.ItemID)
+	// fmt.Printf("respondorderID", order.ID)
+	// params:=mux.Vars(resp)
+	// hasError := false
+	// for _, item := range order.Items {
+	// 	fmt.Println("HII2", item.ItemID)
+
+	// 	fmt.Println("ZZZYYPO", item.ItemID)
+
+	// 	ItemInst, _, err := resBody.GetItemById(item.ItemID)
+
+	// 		fmt.Println("ZZZYYPO", order.Total)
+	// 	if err != nil || ItemInst.Quantity < item.Quantity {
+	// 		// Handle the error, for example, return an HTTP error response
+	// 		hasError = true
+	// 		break
+
+	// 	}
+	// 	ItemInst.Quantity = ItemInst.Quantity - item.Quantity
+	// 	order.Total = ItemInst.Price*float64(item.Quantity) + order.Total
+	// 	resp.UpdateItemQuantity(ItemInst, ItemInst.Quantity)
+
+	// 	fmt.Println("HIIIPO", ItemInst.Quantity)
+	// }
+	// if hasError {
+	// 	w.WriteHeader(http.StatusBadRequest)
+	// 	return
+	// }
 	orders = append(orders, order)
 	json.NewEncoder(w).Encode(order)
+	fmt.Println("respondorderID", order.ID)
 }
 
 func UpdateOrder(w http.ResponseWriter, r *http.Request) {
@@ -101,47 +209,35 @@ func UpdateOrder(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// var config = &oauth2.Config{
+// 	ClientID:     "Ux_BfWJHPssqfqyA9mkrcILfSAoa",
+// 	ClientSecret: "k2f0zEfA4f20VjFO_MJYYgwfwNMa",
+
+// 	// Scopes: []string{"SCOPE1", "SCOPE2"},
+// 	Endpoint: oauth2.Endpoint{
+// 		// AuthURL:  "",
+// 		TokenURL: "https://sts.choreo.dev/oauth2/token",
+// 	},
+// }
+
+var serviceURL = "https://4c49cc7f-a4f9-4bf4-937b-6e7dc9d97bae-dev.e1-eu-north-azure.choreoapis.dev/kdnv/itemservice/item-9e9/v1.0"
+
+// var serviceURL = "http://localhost:9010/item"
+
+// ClientSecret := os.Getenv("CLIENT_SECRET"),
+// TokenURL :=     os.Getenv("TOKEN_URL")
+
+// config := &oauth2.Config{
+// 	ClientID:     "CLIENT_ID",
+// 	ClientSecret: "CLIENT_SECRET",
+// 	Endpoint: oauth2.Endpoint{
+// 		// AuthURL:  "",
+// 		TokenURL: "TOKEN_URL",
+// 	},
+// }
+
 func main() {
 	r := mux.NewRouter()
-
-	// client := clientCredsConfig.Client(context.Background())
-	// // os.Setenv("ServiceURL", "SERVICE_URL")
-	// serviceURL := os.Getenv("ServiceURL")
-	ctx := context.Background()
-
-	conf := &oauth2.Config{
-		ClientID:     "CLIENT_ID",
-		ClientSecret: "CLIENT_SECRET",
-
-		// Scopes: []string{"SCOPE1", "SCOPE2"},
-		Endpoint: oauth2.Endpoint{
-			// AuthURL:  "",
-			TokenURL: "TOKEN_URL",
-		},
-	}
-	// verifier := oauth2.GenerateVerifier()
-
-	var code string
-	if _, err := fmt.Scan(&code); err != nil {
-		log.Fatal(err)
-	}
-
-	// Use the custom HTTP client when requesting a token.
-	httpClient := &http.Client{Timeout: 2 * time.Second}
-	ctx = context.WithValue(ctx, oauth2.HTTPClient, httpClient)
-
-	tok, err := conf.Exchange(ctx, code)
-	fmt.Printf("HHH")
-	if err != nil {
-		fmt.Printf("KKK")
-		log.Fatal(err)
-	}
-
-	client := conf.Client(ctx, tok)
-	_ = client
-
-	// rootRouter := r.PathPrefix("/").Subrouter()
-	// rootRouter.Use(authenticateMiddlewaretest)
 
 	orders = append(orders, Order{ID: "1", Items: []OrderItem{{ItemID: "1", Quantity: 2}}, Total: 2000, Status: "Ongoing"})
 	orders = append(orders, Order{ID: "2", Items: []OrderItem{{ItemID: "1", Quantity: 2}, {ItemID: "2", Quantity: 3}}, Total: 2000, Status: "Ongoing"})
@@ -200,11 +296,42 @@ func main() {
 // 		// 	return
 // 		// }
 
-// 		next.ServeHTTP(w, r)
-// 	})
-// }
-// func GetOAuth2Token() (*http.Client, error) {
+//			next.ServeHTTP(w, r)
+//		})
+//	}
+//
+//	func GetOAuth2Token() (*http.Client, error) {
+//		// Get the OAuth2 token using the client credentials
+//		client := conf.Client(context.Background())
+//		return client
+//	}
+// func GetOAuth2Token() (*oauth2.TokenResponse, error) {
 // 	// Get the OAuth2 token using the client credentials
-// 	client := clientCredsConfig.Client(context.Background())
-// 	return client, nil
+// 	token, err := conf.Token(context.Background())
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return token, nil
 // }
+
+// func GetOAuth2Token() (*oauth2.Token, error) {
+// 	// Get the OAuth2 token using the client credentials
+// 	token, err := clientCredsConfig.Token(context.Background())
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return token, nil
+// }
+
+//	var clientCredsConfig = &clientcredentials.Config{
+//		ClientID:     os.Getenv("CLIENT_ID"),
+//		ClientSecret: os.Getenv("CLIENT_SECRET"),
+//		TokenURL:     os.Getenv("TOKEN_URL"),
+//	}
+func ParseBody(r *http.Request, x interface{}) {
+	if body, err := ioutil.ReadAll(r.Body); err == nil {
+		if err := json.Unmarshal([]byte(body), x); err != nil {
+			return
+		}
+	}
+}
