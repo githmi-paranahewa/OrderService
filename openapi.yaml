@@ -95,21 +95,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-    put:
-      tags:
-        - default
-      summary: update
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/OrderInput"
-      responses:
-        "200":
-          description: Successful response
-          content:
-            application/json: {}
+    
     get:
       tags:
         - default
@@ -130,6 +116,24 @@ paths:
         required: true
         schema:
           type: string
+
+    put:
+      tags:
+        - default
+      summary: update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderInput"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json: {}
+
+    
     delete:
       tags:
         - default
