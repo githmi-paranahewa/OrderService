@@ -95,7 +95,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-    
+
     get:
       tags:
         - default
@@ -133,7 +133,18 @@ paths:
           content:
             application/json: {}
 
-    
+    get:
+      tags:
+        - default
+      summary: get by ID
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderInput"
+
     delete:
       tags:
         - default
