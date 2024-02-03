@@ -132,6 +132,18 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
+     get:
+      tags:
+        - default
+      summary: get
+      responses:
+        "200":
+          description: Successful response
+          content:
+            text/plain:
+              schema:
+                type: string
     
     delete:
       tags:
