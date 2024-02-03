@@ -46,10 +46,20 @@ type Order struct {
 	Status string
 }
 
+// var clientCredsConfig = clientcredentials.Config{
+// 	ClientID:     os.Getenv("CLIENT_ID"),
+// 	ClientSecret: os.Getenv("CLIENT_SECRET"),
+// 	TokenURL:     os.Getenv("TOKEN_URL"),
+// }
+
+var clientID = os.Getenv("CLIENT_ID")
+var clientSecret = os.Getenv("CLIENT_SECRET")
+var tokenURL = os.Getenv("TOKEN_URL")
+
 var clientCredsConfig = clientcredentials.Config{
-	ClientID:     os.Getenv("CLIENT_ID"),
-	ClientSecret: os.Getenv("CLIENT_SECRET"),
-	TokenURL:     os.Getenv("TOKEN_URL"),
+	ClientID:     clientID,
+	ClientSecret: clientSecret,
+	TokenURL:     tokenURL,
 }
 
 func makeClient() *http.Client {
