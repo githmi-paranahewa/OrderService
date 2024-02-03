@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,7 +12,7 @@ import (
 	"strconv"
 	// "time"
 
-	// "os"
+	"os"
 
 	// "fmt"
 	"log"
@@ -27,11 +28,10 @@ import (
 )
 
 type Item struct {
-	ID         string
-	Name       string
-	Price      float64
-	Quantity   int
-	OrderItems []OrderItem `gorm:"foreignKey:ItemID"`
+	ID       string
+	Name     string
+	Price    float64
+	Quantity int
 }
 
 type OrderItem struct {
@@ -46,16 +46,10 @@ type Order struct {
 	Status string
 }
 
-// var clientCredsConfig = clientcredentials.Config{
-// 	ClientID:     os.Getenv("CLIENT_ID"),
-// 	ClientSecret: os.Getenv("CLIENT_SECRET"),
-// 	TokenURL:     os.Getenv("TOKEN_URL"),
-// }
-
 var clientCredsConfig = clientcredentials.Config{
-	ClientID:     "NmjtwiEs8yPft4wii9WGwc_TPIca",
-	ClientSecret: "m8HOuvjruaGnDXg6vMteXp9clcAa",
-	TokenURL:     "https://sts.choreo.dev/oauth2/token",
+	ClientID:     os.Getenv("CLIENT_ID"),
+	ClientSecret: os.Getenv("CLIENT_SECRET"),
+	TokenURL:     os.Getenv("TOKEN_URL"),
 }
 
 func makeClient() *http.Client {
@@ -89,12 +83,40 @@ func GetOrder(w http.ResponseWriter, r *http.Request) {
 
 func DeleteOrder(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "pkgication/json")
+	client := makeClient()
 	params := mux.Vars(r)
-	for index, instance := range orders {
-		if instance.ID == params["orderId"] {
+	var updatedItem Item
+	for index, orderInstance := range orders {
+		if orderInstance.ID == params["orderId"] {
+
+			for _, orderitem := range orderInstance.Items {
+				fmt.Println("oreder", orderitem.ItemID)
+				var itemID = orderitem.ItemID
+				item, err := GetItemByID(client, serviceURL, itemID)
+				if err != nil {
+					fmt.Println("Error getting item:", err)
+					return
+				}
+
+				fmt.Println("orderQ", orderitem.Quantity, "itemquan", item.Quantity)
+
+				item.Quantity = item.Quantity + orderitem.Quantity
+
+				// Print the retrieved item
+				fmt.Printf("ID: %s, Name: %s, Price: %f, Quantity: %d\n", item.ID, item.Name, item.Price, item.Quantity)
+				updatedItem = *item
+				err = UpdateItem(client, serviceURL, itemID, updatedItem)
+				if err != nil {
+					fmt.Println("Error updating item:", err)
+					return
+				}
+
+			}
+
 			orders = append(orders[:index], orders[index+1:]...)
 			break
 		}
+
 	}
 	json.NewEncoder(w).Encode(orders)
 }
@@ -102,9 +124,9 @@ func DeleteOrder(w http.ResponseWriter, r *http.Request) {
 func GetOrderById(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "pkgication/json")
 	params := mux.Vars(r)
-	for _, instance := range orders {
-		if instance.ID == params["orderId"] {
-			json.NewEncoder(w).Encode(instance)
+	for _, orderInstance := range orders {
+		if orderInstance.ID == params["orderId"] {
+			json.NewEncoder(w).Encode(orderInstance)
 			return
 		}
 	}
@@ -113,99 +135,153 @@ func GetOrderById(w http.ResponseWriter, r *http.Request) {
 func AddOrder(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "pkgication/json")
 	client := makeClient()
-	resp, err := client.Get(serviceURL + "/item")
-	if err != nil {
-		fmt.Printf("Error making API request: %v\n", err)
-		return
-	}
-	var respond Item
-	defer resp.Body.Close()
-	resBody, err := ioutil.ReadAll(resp.Body)
-	fmt.Println("show respBody ", string(resBody))
-	if err != nil {
-		fmt.Println("error")
-	}
-	var items []Item
 
-	// Unmarshal the JSON data into the struct
-	err = json.Unmarshal(resBody, &items)
-	if err != nil {
-		fmt.Println("Error unmarshalling JSON:", err)
-		return
-	}
-
-	// Now, 'item' contains the structured data
-	for _, item := range items {
-		fmt.Printf("ID: %s, Name: %s, Price: %f, Quantity: %d\n", item.ID, item.Name, item.Price, item.Quantity)
-	}
-	// for _, item := range resBody {
-	// err = json.Unmarshal(resBody, &respond)
-	// fmt.Println()
+	// items, err := GetItems(client, serviceURL)
 	// if err != nil {
-	// 	http.Error(w, "Error unmarshalling JSON", http.StatusInternalServerError)
+	// 	fmt.Println("Error getting items:", err)
 	// 	return
 	// }
-	// }
-	// err = json.Unmarshal([]byte(resBody), &respond)
-	// err, _ = w.Write(resBody)
-	// _ = json.NewDecoder().Decode(&respond)
-	fmt.Println("After Unmarshal-respondbody")
-	fmt.Println("RespondID start", respond.Name, "end ")
 
-	// defer resp.Body.Close()
-	// fmt.Printf("request: %v\n", resp)
+	// // Print the retrieved items
+	// for _, item := range items {
+	// 	fmt.Printf("ID: %s, Name: %s, Price: %f, Quantity: %d\n", item.ID, item.Name, item.Price, item.Quantity)
+	// }
+
+	var hasError = false
 	var order Order
-	// var respond Item
+	var updatedItem Item
 	// _ = json.NewDecoder(resp.Body).Decode(&respond)
 
 	_ = json.NewDecoder(r.Body).Decode(&order)
 	order.ID = strconv.Itoa(rand.Intn(100000000))
-	// fmt.Printf("respondID", respond.ItemID)
-	// fmt.Printf("respondorderID", order.ID)
-	// params:=mux.Vars(resp)
-	// hasError := false
-	// for _, item := range order.Items {
-	// 	fmt.Println("HII2", item.ItemID)
 
-	// 	fmt.Println("ZZZYYPO", item.ItemID)
+	for _, orderitem := range order.Items {
+		fmt.Println("oreder", orderitem.ItemID)
+		var itemID = orderitem.ItemID
+		item, err := GetItemByID(client, serviceURL, itemID)
 
-	// 	ItemInst, _, err := resBody.GetItemById(item.ItemID)
+		fmt.Println("orderQ", orderitem.Quantity, "itemquan", item.Quantity)
+		if err != nil || orderitem.Quantity > item.Quantity {
+			hasError = true
+			break
+		}
+		item.Quantity = item.Quantity - orderitem.Quantity
+		order.Total = item.Price*float64(orderitem.Quantity) + order.Total
 
-	// 		fmt.Println("ZZZYYPO", order.Total)
-	// 	if err != nil || ItemInst.Quantity < item.Quantity {
-	// 		// Handle the error, for example, return an HTTP error response
-	// 		hasError = true
-	// 		break
+		// Print the retrieved item
+		fmt.Printf("ID: %s, Name: %s, Price: %f, Quantity: %d\n", item.ID, item.Name, item.Price, item.Quantity)
+		updatedItem = *item
+		err = UpdateItem(client, serviceURL, itemID, updatedItem)
+		if err != nil {
+			fmt.Println("Error updating item:", err)
+			return
+		}
 
-	// 	}
-	// 	ItemInst.Quantity = ItemInst.Quantity - item.Quantity
-	// 	order.Total = ItemInst.Price*float64(item.Quantity) + order.Total
-	// 	resp.UpdateItemQuantity(ItemInst, ItemInst.Quantity)
+	}
 
-	// 	fmt.Println("HIIIPO", ItemInst.Quantity)
-	// }
-	// if hasError {
-	// 	w.WriteHeader(http.StatusBadRequest)
-	// 	return
-	// }
+	if hasError {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	orders = append(orders, order)
 	json.NewEncoder(w).Encode(order)
 	fmt.Println("respondorderID", order.ID)
 }
 
 func UpdateOrder(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "pkgication/json")
+	// w.Header().Set("Content-Type", "pkgication/json")
+	// params := mux.Vars(r)
+	// for index, orderInstance := range orders {
+	// 	if instance.ID == params["orderId"] {
+	// 		orders = append(orders[:index], orders[index+1:]...)
+	// 		var order Order
+	// 		_ = json.NewDecoder(r.Body).Decode(&order)
+	// 		order.ID = params["orderId"]
+	// 		orders = append(orders, order)
+	// 		json.NewEncoder(w).Encode(order)
+	// 	}
+	// }
+
+	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	for index, instance := range orders {
-		if instance.ID == params["orderId"] {
-			orders = append(orders[:index], orders[index+1:]...)
-			var order Order
-			_ = json.NewDecoder(r.Body).Decode(&order)
-			order.ID = params["orderId"]
-			orders = append(orders, order)
-			json.NewEncoder(w).Encode(order)
+	client := makeClient()
+	var preUpdatedItem, updatedItem Item
+	fmt.Println("hi order update")
+	for index, orderInstance := range orders {
+		fmt.Println("hi ou index", index)
+		fmt.Println("hi outside of ", orderInstance.ID, " para ", params["orderId"])
+		if orderInstance.ID == params["orderId"] {
+
+			for _, orderitem := range orderInstance.Items {
+				fmt.Println("oreder", orderitem.ItemID)
+				var itemID = orderitem.ItemID
+				item, err := GetItemByID(client, serviceURL, itemID)
+				if err != nil {
+					fmt.Println("Error getting item:", err)
+					return
+				}
+
+				fmt.Println("orderQ", orderitem.Quantity, "itemquan", item.Quantity)
+
+				item.Quantity = item.Quantity + orderitem.Quantity
+
+				// Print the retrieved item
+				fmt.Printf("ID: %s, Name: %s, Price: %f, Quantity: %d\n", item.ID, item.Name, item.Price, item.Quantity)
+				preUpdatedItem = *item
+				err = UpdateItem(client, serviceURL, itemID, preUpdatedItem)
+				if err != nil {
+					fmt.Println("Error updating item:", err)
+					return
+				}
+
+			}
+
+			fmt.Println("hi inside of ", orderInstance.ID)
+			var updatedOrder Order
+			fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA \n AAAAAAAAAAAA")
+			err := json.NewDecoder(r.Body).Decode(&updatedOrder)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			// Update the existing order
+			updatedOrder.ID = params["orderId"]
+			orders[index] = updatedOrder
+
+			// Respond with the updated order
+			json.NewEncoder(w).Encode(updatedOrder)
+
+			for _, orderitem := range updatedOrder.Items {
+				fmt.Println("oreder", orderitem.ItemID)
+				var itemID = orderitem.ItemID
+				item, err := GetItemByID(client, serviceURL, itemID)
+				if err != nil {
+					fmt.Println("Error getting item:", err)
+					return
+				}
+
+				fmt.Println("orderQUPDATE", orderitem.Quantity, "itemquan", item.Quantity)
+
+				item.Quantity = item.Quantity - orderitem.Quantity
+
+				// Print the retrieved item
+				fmt.Printf("ID: %s, Name: %s, Price: %f, Quantity: %d\n", item.ID, item.Name, item.Price, item.Quantity)
+				updatedItem = *item
+				err = UpdateItem(client, serviceURL, itemID, updatedItem)
+				if err != nil {
+					fmt.Println("Error updating item:", err)
+					return
+				}
+
+			}
+			return
 		}
 	}
+
+	// If the order with the specified ID is not found
+	http.NotFound(w, r)
 
 }
 
@@ -220,7 +296,7 @@ func UpdateOrder(w http.ResponseWriter, r *http.Request) {
 // 	},
 // }
 
-var serviceURL = "https://4c49cc7f-a4f9-4bf4-937b-6e7dc9d97bae-dev.e1-eu-north-azure.choreoapis.dev/kdnv/itemservice/item-9e9/v1.0"
+var serviceURL = os.Getenv("SERVICE_URL")
 
 // var serviceURL = "http://localhost:9010/item"
 
@@ -334,4 +410,105 @@ func ParseBody(r *http.Request, x interface{}) {
 			return
 		}
 	}
+}
+
+func GetItems(client *http.Client, serviceURL string) ([]Item, error) {
+	// Construct the URL for getting items
+	url := fmt.Sprintf("%s/item/", serviceURL)
+
+	// Perform the GET request
+	resp, err := client.Get(url)
+	if err != nil {
+
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// Check the response status
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Failed to get items. Status code: %d", resp.StatusCode)
+	}
+
+	// Read the response body
+	resBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal the JSON array into a slice of Item
+	var items []Item
+	err = json.Unmarshal(resBody, &items)
+	if err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
+func GetItemByID(client *http.Client, serviceURL, itemID string) (*Item, error) {
+	// Construct the URL for getting a specific item by ID
+	url := fmt.Sprintf("%s/item/%s", serviceURL, itemID)
+
+	// Perform the GET request
+	resp, err := client.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// Check the response status
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Failed to get item. Status code: %d", resp.StatusCode)
+	}
+
+	// Read the response body
+	resBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal the JSON response into an Item
+	var item Item
+	err = json.Unmarshal(resBody, &item)
+	if err != nil {
+		return nil, err
+	}
+
+	return &item, nil
+}
+
+func UpdateItem(client *http.Client, serviceURL string, itemID string, updatedItem Item) error {
+	// Convert the updatedItem struct to JSON
+
+	requestBody, err := json.Marshal(updatedItem)
+	if err != nil {
+		return err
+	}
+
+	// Construct the URL with the itemID variable
+	url := fmt.Sprintf("%s/item/%s", serviceURL, itemID)
+
+	// Create a PUT request
+	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(requestBody))
+	if err != nil {
+		return err
+	}
+	fmt.Println("request updated", req, "afterma", string(requestBody))
+
+	// Set the content type header
+	req.Header.Set("Content-Type", "application/json")
+
+	// Perform the PUT request
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Check the response status
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("Failed to update item. Status code: %d", resp.StatusCode)
+	}
+
+	return nil
 }
