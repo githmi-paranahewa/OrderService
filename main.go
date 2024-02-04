@@ -8,7 +8,8 @@ import (
 	"io/ioutil"
 	"math/rand"
 
-	// "os"
+	// "math/rand"
+
 	"strconv"
 	// "time"
 
@@ -32,6 +33,7 @@ type Item struct {
 	Name     string
 	Price    float64
 	Quantity int
+	// OrderItems []OrderItem `gorm:"foreignKey:ItemID"`
 }
 
 type OrderItem struct {
@@ -46,30 +48,15 @@ type Order struct {
 	Status string
 }
 
-// var clientCredsConfig = clientcredentials.Config{
-// 	ClientID:     os.Getenv("CLIENT_ID"),
-// 	ClientSecret: os.Getenv("CLIENT_SECRET"),
-// 	TokenURL:     os.Getenv("TOKEN_URL"),
-// }
-
-// var clientID = os.Getenv("CLIENT_ID")
-// var clientSecret = os.Getenv("CLIENT_SECRET")
-
-// var _ = os.Setenv("tokenURL", "TOKEN_URL") //os.Getenv("TOKEN_URL")
-// var tokenURL = os.Getenv("TOKEN_URL")
-
-// os.Setenv("ServiceURL", "SERVICE_URL")
-
 var clientCredsConfig = clientcredentials.Config{
-	ClientID:     clientID,
-	ClientSecret: clientSecret,
-	TokenURL:     tokenURL,
+	ClientID:     os.Getenv("CLIENT_ID"),
+	ClientSecret: os.Getenv("CLIENT_SECRET"),
+	TokenURL:     os.Getenv("TOKEN_URL"),
 }
 
 var serviceURL = os.Getenv("SERVICE_URL")
-var clientID = os.Getenv("CLIENT_ID")
-var clientSecret = os.Getenv("CLIENT_SECRET")
-var tokenURL = os.Getenv("TOKEN_URL")
+
+// HardCode
 
 func makeClient() *http.Client {
 	var ctx = context.Background()
@@ -88,8 +75,8 @@ func makeClient() *http.Client {
 	return client
 	// resp, err := client.Get(serviceURL)
 	// if err != nil {
-	// 	fmt.Printf("Error making API request: %v\n", err)
-	// 	return
+	//  fmt.Printf("Error making API request: %v\n", err)
+	//  return
 	// }
 }
 
@@ -157,13 +144,13 @@ func AddOrder(w http.ResponseWriter, r *http.Request) {
 
 	// items, err := GetItems(client, serviceURL)
 	// if err != nil {
-	// 	fmt.Println("Error getting items:", err)
-	// 	return
+	//  fmt.Println("Error getting items:", err)
+	//  return
 	// }
 
 	// // Print the retrieved items
 	// for _, item := range items {
-	// 	fmt.Printf("ID: %s, Name: %s, Price: %f, Quantity: %d\n", item.ID, item.Name, item.Price, item.Quantity)
+	//  fmt.Printf("ID: %s, Name: %s, Price: %f, Quantity: %d\n", item.ID, item.Name, item.Price, item.Quantity)
 	// }
 
 	var hasError = false
@@ -212,14 +199,14 @@ func UpdateOrder(w http.ResponseWriter, r *http.Request) {
 	// w.Header().Set("Content-Type", "pkgication/json")
 	// params := mux.Vars(r)
 	// for index, orderInstance := range orders {
-	// 	if instance.ID == params["orderId"] {
-	// 		orders = append(orders[:index], orders[index+1:]...)
-	// 		var order Order
-	// 		_ = json.NewDecoder(r.Body).Decode(&order)
-	// 		order.ID = params["orderId"]
-	// 		orders = append(orders, order)
-	// 		json.NewEncoder(w).Encode(order)
-	// 	}
+	//  if instance.ID == params["orderId"] {
+	//      orders = append(orders[:index], orders[index+1:]...)
+	//      var order Order
+	//      _ = json.NewDecoder(r.Body).Decode(&order)
+	//      order.ID = params["orderId"]
+	//      orders = append(orders, order)
+	//      json.NewEncoder(w).Encode(order)
+	//  }
 	// }
 
 	w.Header().Set("Content-Type", "application/json")
@@ -305,14 +292,14 @@ func UpdateOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 // var config = &oauth2.Config{
-// 	ClientID:     "Ux_BfWJHPssqfqyA9mkrcILfSAoa",
-// 	ClientSecret: "k2f0zEfA4f20VjFO_MJYYgwfwNMa",
+//  ClientID:     "Ux_BfWJHPssqfqyA9mkrcILfSAoa",
+//  ClientSecret: "k2f0zEfA4f20VjFO_MJYYgwfwNMa",
 
-// 	// Scopes: []string{"SCOPE1", "SCOPE2"},
-// 	Endpoint: oauth2.Endpoint{
-// 		// AuthURL:  "",
-// 		TokenURL: "https://sts.choreo.dev/oauth2/token",
-// 	},
+//  // Scopes: []string{"SCOPE1", "SCOPE2"},
+//  Endpoint: oauth2.Endpoint{
+//      // AuthURL:  "",
+//      TokenURL: "https://sts.choreo.dev/oauth2/token",
+//  },
 // }
 
 // var serviceURL = "http://localhost:9010/item"
@@ -321,21 +308,16 @@ func UpdateOrder(w http.ResponseWriter, r *http.Request) {
 // TokenURL :=     os.Getenv("TOKEN_URL")
 
 // config := &oauth2.Config{
-// 	ClientID:     "CLIENT_ID",
-// 	ClientSecret: "CLIENT_SECRET",
-// 	Endpoint: oauth2.Endpoint{
-// 		// AuthURL:  "",
-// 		TokenURL: "TOKEN_URL",
-// 	},
+//  ClientID:     "CLIENT_ID",
+//  ClientSecret: "CLIENT_SECRET",
+//  Endpoint: oauth2.Endpoint{
+//      // AuthURL:  "",
+//      TokenURL: "TOKEN_URL",
+//  },
 // }
 
 func main() {
 	r := mux.NewRouter()
-
-	// os.Setenv("ServiceURL", "SERVICE_URL")
-	// os.Setenv("ServiceURL", "SERVICE_URL")
-	// serviceURL := os.Getenv("ServiceURL")
-	// h, err := os.LookupEnv(e)
 
 	orders = append(orders, Order{ID: "1", Items: []OrderItem{{ItemID: "1", Quantity: 2}}, Total: 2000, Status: "Ongoing"})
 	orders = append(orders, Order{ID: "2", Items: []OrderItem{{ItemID: "1", Quantity: 2}, {ItemID: "2", Quantity: 3}}, Total: 2000, Status: "Ongoing"})
@@ -350,81 +332,81 @@ func main() {
 }
 
 // func authenticateMiddleware(client *http.Client, serviceURL string) func(http.Handler) http.Handler {
-// 	return func(next http.Handler) http.Handler {
-// 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//  return func(next http.Handler) http.Handler {
+//      return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-// 			params := mux.Vars(r)
-// 			a, err := client.Get(params[serviceURL])
+//          params := mux.Vars(r)
+//          a, err := client.Get(params[serviceURL])
 
-// 			if err != nil {
-// 				fmt.Println("url", a, "error", err)
-// 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
-// 				return
-// 			}
+//          if err != nil {
+//              fmt.Println("url", a, "error", err)
+//              http.Error(w, "Unauthorized", http.StatusUnauthorized)
+//              return
+//          }
 
-// 			next.ServeHTTP(w, r)
-// 		})
-// 	}
+//          next.ServeHTTP(w, r)
+//      })
+//  }
 // }
 
 // func authenticateMiddleware(next *http.Client, se string) http.Handler {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		fmt.Println("middleware2")
-// 		// next.ServeHTTP(w, r)
-// 	})
+//  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//      fmt.Println("middleware2")
+//      // next.ServeHTTP(w, r)
+//  })
 // }
 
 // func authenticateMiddlewaretest(next http.Handler) http.Handler {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		fmt.Println("middleware2")
-// 		_, err := GetOAuth2Token()
-// 		if err != nil {
-// 			fmt.Println("Error obtaining token:", err)
-// 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-// 			return
-// 		}
-// 		// client := clientCredsConfig.Client(context.Background())
-// 		// os.Setenv("ServiceURL", "SERVICE_URL")
-// 		// serviceURL := os.Getenv("ServiceURL")
-// 		// h, err := os.LookupEnv(e)
-// 		// a, err := client.Get(serviceURL)
-// 		// if err != nil {
-// 		// 	fmt.Println("url", a, "error", err)
-// 		// 	http.Error(w, "Unauthorized", http.StatusUnauthorized)
-// 		// 	return
-// 		// }
+//  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//      fmt.Println("middleware2")
+//      _, err := GetOAuth2Token()
+//      if err != nil {
+//          fmt.Println("Error obtaining token:", err)
+//          http.Error(w, "Unauthorized", http.StatusUnauthorized)
+//          return
+//      }
+//      // client := clientCredsConfig.Client(context.Background())
+//      // os.Setenv("ServiceURL", "SERVICE_URL")
+//      // serviceURL := os.Getenv("ServiceURL")
+//      // h, err := os.LookupEnv(e)
+//      // a, err := client.Get(serviceURL)
+//      // if err != nil {
+//      //  fmt.Println("url", a, "error", err)
+//      //  http.Error(w, "Unauthorized", http.StatusUnauthorized)
+//      //  return
+//      // }
 
-//			next.ServeHTTP(w, r)
-//		})
-//	}
+//          next.ServeHTTP(w, r)
+//      })
+//  }
 //
-//	func GetOAuth2Token() (*http.Client, error) {
-//		// Get the OAuth2 token using the client credentials
-//		client := conf.Client(context.Background())
-//		return client
-//	}
+//  func GetOAuth2Token() (*http.Client, error) {
+//      // Get the OAuth2 token using the client credentials
+//      client := conf.Client(context.Background())
+//      return client
+//  }
 // func GetOAuth2Token() (*oauth2.TokenResponse, error) {
-// 	// Get the OAuth2 token using the client credentials
-// 	token, err := conf.Token(context.Background())
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return token, nil
+//  // Get the OAuth2 token using the client credentials
+//  token, err := conf.Token(context.Background())
+//  if err != nil {
+//      return nil, err
+//  }
+//  return token, nil
 // }
 
 // func GetOAuth2Token() (*oauth2.Token, error) {
-// 	// Get the OAuth2 token using the client credentials
-// 	token, err := clientCredsConfig.Token(context.Background())
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return token, nil
+//  // Get the OAuth2 token using the client credentials
+//  token, err := clientCredsConfig.Token(context.Background())
+//  if err != nil {
+//      return nil, err
+//  }
+//  return token, nil
 // }
 
 //	var clientCredsConfig = &clientcredentials.Config{
-//		ClientID:     os.Getenv("CLIENT_ID"),
-//		ClientSecret: os.Getenv("CLIENT_SECRET"),
-//		TokenURL:     os.Getenv("TOKEN_URL"),
+//	    ClientID:     os.Getenv("CLIENT_ID"),
+//	    ClientSecret: os.Getenv("CLIENT_SECRET"),
+//	    TokenURL:     os.Getenv("TOKEN_URL"),
 //	}
 func ParseBody(r *http.Request, x interface{}) {
 	if body, err := ioutil.ReadAll(r.Body); err == nil {
