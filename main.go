@@ -36,13 +36,16 @@ type Order struct {
 	Total float64
 }
 
-var clientCredsConfig = clientcredentials.Config{
-	ClientID:     os.Getenv("CLIENT_ID"),
-	ClientSecret: os.Getenv("CLIENT_SECRET"),
-	TokenURL:     os.Getenv("TOKEN_URL"),
-}
-
 var serviceURL = os.Getenv("SERVICE_URL")
+var clientID = os.Getenv("CLIENT_ID")
+var clientSecret = os.Getenv("CLIENT_SECRET")
+var tokenURL = os.Getenv("TOKEN_URL")
+
+var clientCredsConfig = clientcredentials.Config{
+	ClientID:     clientID,
+	ClientSecret: clientSecret,
+	TokenURL:     tokenURL,
+}
 
 // HardCode
 
@@ -234,7 +237,10 @@ func UpdateOrder(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	r := mux.NewRouter()
-
+	os.Setenv("SERVICE_URL", "https://4c49cc7f-a4f9-4bf4-937b-6e7dc9d97bae-dev.e1-eu-north-azure.choreoapis.dev/kdnv/itemservice/item-9e9/v1.0")
+	os.Setenv("CLIENT_ID", "NmjtwiEs8yPft4wii9WGwc_TPIca")
+	os.Setenv("CLIENT_SECRET", "m8HOuvjruaGnDXg6vMteXp9clcAaitemscoon")
+	os.Setenv("TOKEN_URL", "https://sts.choreo.dev/oauth2/token")
 	orders = append(orders, Order{ID: "1", Items: []OrderItem{{ItemID: "1", Quantity: 2}}, Total: 600})
 	orders = append(orders, Order{ID: "2", Items: []OrderItem{{ItemID: "1", Quantity: 2}, {ItemID: "2", Quantity: 3}}, Total: 720})
 
