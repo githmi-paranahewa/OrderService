@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/rand"
+	"os"
 
 	// "os"
 	"strconv"
@@ -46,16 +47,10 @@ type Order struct {
 	Status string
 }
 
-// var clientCredsConfig = clientcredentials.Config{
-// 	ClientID:     os.Getenv("CLIENT_ID"),
-// 	ClientSecret: os.Getenv("CLIENT_SECRET"),
-// 	TokenURL:     os.Getenv("TOKEN_URL"),
-// }
-
 var clientCredsConfig = clientcredentials.Config{
-	ClientID:     "NmjtwiEs8yPft4wii9WGwc_TPIca",
-	ClientSecret: "m8HOuvjruaGnDXg6vMteXp9clcAa",
-	TokenURL:     "https://sts.choreo.dev/oauth2/token",
+	ClientID:     os.Getenv("CLIENT_ID"),
+	ClientSecret: os.Getenv("CLIENT_SECRET"),
+	TokenURL:     os.Getenv("TOKEN_URL"),
 }
 
 func makeClient() *http.Client {
