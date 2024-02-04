@@ -52,15 +52,24 @@ type Order struct {
 // 	TokenURL:     os.Getenv("TOKEN_URL"),
 // }
 
-var clientID = os.Getenv("CLIENT_ID")
-var clientSecret = os.Getenv("CLIENT_SECRET")
-var tokenURL = os.Getenv("TOKEN_URL")
+// var clientID = os.Getenv("CLIENT_ID")
+// var clientSecret = os.Getenv("CLIENT_SECRET")
+
+// var _ = os.Setenv("tokenURL", "TOKEN_URL") //os.Getenv("TOKEN_URL")
+// var tokenURL = os.Getenv("TOKEN_URL")
+
+// os.Setenv("ServiceURL", "SERVICE_URL")
 
 var clientCredsConfig = clientcredentials.Config{
 	ClientID:     clientID,
 	ClientSecret: clientSecret,
 	TokenURL:     tokenURL,
 }
+
+var serviceURL = os.Getenv("SERVICE_URL")
+var clientID = os.Getenv("CLIENT_ID")
+var clientSecret = os.Getenv("CLIENT_SECRET")
+var tokenURL = os.Getenv("TOKEN_URL")
 
 func makeClient() *http.Client {
 	var ctx = context.Background()
@@ -306,8 +315,6 @@ func UpdateOrder(w http.ResponseWriter, r *http.Request) {
 // 	},
 // }
 
-var serviceURL = os.Getenv("SERVICE_URL")
-
 // var serviceURL = "http://localhost:9010/item"
 
 // ClientSecret := os.Getenv("CLIENT_SECRET"),
@@ -324,6 +331,11 @@ var serviceURL = os.Getenv("SERVICE_URL")
 
 func main() {
 	r := mux.NewRouter()
+
+	// os.Setenv("ServiceURL", "SERVICE_URL")
+	// os.Setenv("ServiceURL", "SERVICE_URL")
+	// serviceURL := os.Getenv("ServiceURL")
+	// h, err := os.LookupEnv(e)
 
 	orders = append(orders, Order{ID: "1", Items: []OrderItem{{ItemID: "1", Quantity: 2}}, Total: 2000, Status: "Ongoing"})
 	orders = append(orders, Order{ID: "2", Items: []OrderItem{{ItemID: "1", Quantity: 2}, {ItemID: "2", Quantity: 3}}, Total: 2000, Status: "Ongoing"})
