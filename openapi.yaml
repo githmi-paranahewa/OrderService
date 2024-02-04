@@ -173,5 +173,3 @@ components:
                 type: integer
         Total:
           type: number
-        Status:
-          type: string
