@@ -47,7 +47,7 @@ var clientCredsConfig = clientcredentials.Config{
 	TokenURL:     tokenURL,
 }
 
-// var client2 = clientCredsConfig.Client(context.Background())
+var client2 = clientCredsConfig.Client(context.Background())
 
 // HardCode
 
