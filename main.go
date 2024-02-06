@@ -240,6 +240,10 @@ func UpdateOrder(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := mux.NewRouter()
 	// fmt.Println(client2)
+	fmt.Println("clientID", clientCredsConfig.ClientID)
+	fmt.Println("tokenURL", clientCredsConfig.TokenURL)
+	fmt.Println("clientsecret", clientCredsConfig.ClientSecret)
+	fmt.Println("serviceURL", serviceURL)
 
 	orders = append(orders, Order{ID: "1", Items: []OrderItem{{ItemID: "1", Quantity: 2}}, Total: 600})
 	orders = append(orders, Order{ID: "2", Items: []OrderItem{{ItemID: "1", Quantity: 2}, {ItemID: "2", Quantity: 3}}, Total: 720})
