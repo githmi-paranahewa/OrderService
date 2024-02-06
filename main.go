@@ -47,7 +47,7 @@ var clientCredsConfig = clientcredentials.Config{
 	TokenURL:     tokenURL,
 }
 
-var client2 = clientCredsConfig.Client(context.Background())
+// var client2 = clientCredsConfig.Client(context.Background())
 
 // HardCode
 
@@ -240,6 +240,7 @@ func UpdateOrder(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := mux.NewRouter()
 	// fmt.Println(client2)
+	fmt.Println("SERVICE_URL", serviceURL)
 	os.Setenv("SERVICE_URL", "https://4c49cc7f-a4f9-4bf4-937b-6e7dc9d97bae-dev.e1-eu-north-azure.choreoapis.dev/kdnv/itemservice/item-9e9/v1.0")
 	os.Setenv("CLIENT_ID", "NmjtwiEs8yPft4wii9WGwc_TPIca")
 	os.Setenv("CLIENT_SECRET", "m8HOuvjruaGnDXg6vMteXp9clcAaitemscoon")
