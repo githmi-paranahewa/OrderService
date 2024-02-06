@@ -47,9 +47,7 @@ var clientCredsConfig = clientcredentials.Config{
 	TokenURL:     tokenURL,
 }
 
-var client2 = clientCredsConfig.Client(context.Background())
-
-// HardCode
+// var client2 = clientCredsConfig.Client(context.Background())
 
 func makeClient() *http.Client {
 	var ctx = context.Background()
@@ -77,7 +75,7 @@ func GetOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteOrder(w http.ResponseWriter, r *http.Request) {
-	// w.Header().Set("Content-Type", "pkgication/json")
+	w.Header().Set("Content-Type", "pkgication/json")
 	client := makeClient()
 	params := mux.Vars(r)
 
@@ -167,7 +165,7 @@ func AddOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateOrder(w http.ResponseWriter, r *http.Request) {
-	// w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 	client := makeClient()
 
@@ -239,12 +237,6 @@ func UpdateOrder(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	r := mux.NewRouter()
-	// fmt.Println(client2)
-	fmt.Println("clientID", os.Getenv("CLIENT_ID"))
-	fmt.Println("clientID", clientCredsConfig.ClientID)
-	fmt.Println("tokenURL", clientCredsConfig.TokenURL)
-	fmt.Println("clientsecret", clientCredsConfig.ClientSecret)
-	fmt.Println("serviceURL", serviceURL)
 
 	orders = append(orders, Order{ID: "1", Items: []OrderItem{{ItemID: "1", Quantity: 2}}, Total: 600})
 	orders = append(orders, Order{ID: "2", Items: []OrderItem{{ItemID: "1", Quantity: 2}, {ItemID: "2", Quantity: 3}}, Total: 720})
@@ -257,6 +249,8 @@ func main() {
 	log.Fatal(http.ListenAndServe(":9090", r))
 
 }
+
+//Item related Func
 
 func GetItems(client *http.Client, serviceURL string) ([]Item, error) {
 	url := fmt.Sprintf("%s/item/", serviceURL)
