@@ -128,7 +128,7 @@ func GetOrderById(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddOrder(w http.ResponseWriter, r *http.Request) {
-	// w.Header().Set("Content-Type", "pkgication/json")
+	w.Header().Set("Content-Type", "pkgication/json")
 	client := makeClient()
 
 	var hasError = false
