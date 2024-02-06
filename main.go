@@ -77,7 +77,7 @@ func GetOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteOrder(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "pkgication/json")
+	// w.Header().Set("Content-Type", "pkgication/json")
 	client := makeClient()
 	params := mux.Vars(r)
 
@@ -128,7 +128,7 @@ func GetOrderById(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddOrder(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "pkgication/json")
+	// w.Header().Set("Content-Type", "pkgication/json")
 	client := makeClient()
 
 	var hasError = false
@@ -167,7 +167,7 @@ func AddOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateOrder(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	// w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 	client := makeClient()
 
