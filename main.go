@@ -37,14 +37,15 @@ type Order struct {
 }
 
 var serviceURL = os.Getenv("SERVICE_URL")
-var clientID = os.Getenv("CLIENT_ID")
-var clientSecret = os.Getenv("CLIENT_SECRET")
-var tokenURL = os.Getenv("TOKEN_URL")
+
+// var clientID = os.Getenv("CLIENT_ID")
+// var clientSecret = os.Getenv("CLIENT_SECRET")
+// var tokenURL = os.Getenv("TOKEN_URL")
 
 var clientCredsConfig = clientcredentials.Config{
-	ClientID:     clientID,
-	ClientSecret: clientSecret,
-	TokenURL:     tokenURL,
+	ClientID:     os.Getenv("CLIENT_ID"),     //clientID,
+	ClientSecret: os.Getenv("CLIENT_SECRET"), //clientSecret,
+	TokenURL:     os.Getenv("TOKEN_URL"),     //tokenURL,
 }
 
 var client2 = clientCredsConfig.Client(context.Background())
