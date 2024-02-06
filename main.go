@@ -36,11 +36,6 @@ type Order struct {
 	Total float64
 }
 
-var err1 = os.Setenv("SERVICE_URL", "https://4c49cc7f-a4f9-4bf4-937b-6e7dc9d97bae-dev.e1-eu-north-azure.choreoapis.dev/kdnv/itemservice/item-9e9/v1.0")
-var err2 = os.Setenv("CLIENT_ID", "NmjtwiEs8yPft4wii9WGwc_TPIca")
-var err3 = os.Setenv("CLIENT_SECRET", "m8HOuvjruaGnDXg6vMteXp9clcAa")
-var err4 = os.Setenv("TOKEN_URL", "https://sts.choreo.dev/oauth2/token")
-
 var serviceURL = os.Getenv("SERVICE_URL")
 var clientID = os.Getenv("CLIENT_ID")
 var clientSecret = os.Getenv("CLIENT_SECRET")
