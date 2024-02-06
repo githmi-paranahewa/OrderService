@@ -31,17 +31,17 @@ spec:
       # This is only applicable to REST endpoint types.
       # The path should be relative to the docker context.
       schemaFilePath: openapi.yaml
-outbound:
-  # +optional Defines the service references from the internal API marketplace.
-  serviceReferences:
-    - name: choreo:///githmi/kdnv/knjmeg/9e916/v1.0/PUBLIC
-      connectionConfig: 01eec188-fd08-1f66-ab23-939a3db072e8
-      env:
-        - from: ServiceURL
-          to: SERVICE_URL
-        - from: ConsumerKey
-          to: CLIENT_ID
-        - from: ConsumerSecret
-          to: CLIENT_SECRET
-        - from: TokenURL
-          to: TOKEN_URL
+  outbound:
+    # +optional Defines the service references from the internal API marketplace.
+    serviceReferences:
+      - name: choreo:///githmi/kdnv/knjmeg/9e916/v1.0/PUBLIC
+        connectionConfig: 01eec188-fd08-1f66-ab23-939a3db072e8
+        env:
+          - from: ServiceURL
+            to: SERVICE_URL
+          - from: ConsumerKey
+            to: CLIENT_ID
+          - from: ConsumerSecret
+            to: CLIENT_SECRET
+          - from: TokenURL
+            to: TOKEN_URL
