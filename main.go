@@ -240,6 +240,7 @@ func UpdateOrder(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := mux.NewRouter()
 	// fmt.Println(client2)
+	fmt.Println("clientID", os.Getenv("CLIENT_ID"))
 	fmt.Println("clientID", clientCredsConfig.ClientID)
 	fmt.Println("tokenURL", clientCredsConfig.TokenURL)
 	fmt.Println("clientsecret", clientCredsConfig.ClientSecret)
