@@ -47,8 +47,6 @@ var clientCredsConfig = clientcredentials.Config{
 	TokenURL:     tokenURL,
 }
 
-// var client2 = clientCredsConfig.Client(context.Background())
-
 func makeClient() *http.Client {
 	var ctx = context.Background()
 
@@ -136,6 +134,23 @@ func AddOrder(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&order)
 	order.ID = strconv.Itoa(rand.Intn(100000000))
 	order.Total = 0
+
+	for _, orderitem := range order.Items {
+		var itemID = orderitem.ItemID
+		item, err := GetItemByID(client, serviceURL, itemID)
+
+		if err != nil || orderitem.Quantity > item.Quantity {
+			hasError = true
+			break
+		}
+
+	}
+
+	if hasError {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	for _, orderitem := range order.Items {
 		var itemID = orderitem.ItemID
 		item, err := GetItemByID(client, serviceURL, itemID)
@@ -152,11 +167,6 @@ func AddOrder(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("Error updating item:", err)
 			return
 		}
-	}
-
-	if hasError {
-		w.WriteHeader(http.StatusBadRequest)
-		return
 	}
 
 	orders = append(orders, order)
